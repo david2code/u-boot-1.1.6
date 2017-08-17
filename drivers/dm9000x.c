@@ -124,7 +124,7 @@ dump_regs(void)
 	DM9000_DBG("TSRII (0x04): %02x\n", DM9000_ior(4));
 	DM9000_DBG("RCR   (0x05): %02x\n", DM9000_ior(5));
 	DM9000_DBG("RSR   (0x06): %02x\n", DM9000_ior(6));
-	DM9000_DBG("ISR   (0xFE): %02x\n", DM9000_ior(ISR));
+	//DM9000_DBG("ISR   (0xFE): %02x\n", DM9000_ior(ISR));
 	DM9000_DBG("\n");
 }
 #endif				/*  */
@@ -301,7 +301,7 @@ eth_init(bd_t * bd)
 
 	/* Set Node address */
 	for (i = 0; i < 6; i++)
-		((u16 *) bd->bi_enetaddr)[i] = read_srom_word(i);
+		//((u16 *) bd->bi_enetaddr)[i] = read_srom_word(i);
 	printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x\n", bd->bi_enetaddr[0],
 	       bd->bi_enetaddr[1], bd->bi_enetaddr[2], bd->bi_enetaddr[3],
 	       bd->bi_enetaddr[4], bd->bi_enetaddr[5]);
@@ -319,6 +319,7 @@ eth_init(bd_t * bd)
 	DM9000_iow(DM9000_RCR, RCR_DIS_LONG | RCR_DIS_CRC | RCR_RXEN);	/* RX enable */
 	DM9000_iow(DM9000_IMR, IMR_PAR);	/* Enable TX/RX interrupt mask */
 	i = 0;
+	#if 0
 	while (!(phy_read(1) & 0x20)) {	/* autonegation complete bit */
 		udelay(1000);
 		i++;
@@ -327,6 +328,7 @@ eth_init(bd_t * bd)
 			return 0;
 		}
 	}
+	#endif
 
 	/* see what we've got */
 	lnk = phy_read(17) >> 12;

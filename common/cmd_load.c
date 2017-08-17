@@ -34,7 +34,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #if (CONFIG_COMMANDS & CFG_CMD_LOADB)
-static ulong load_serial_ymodem (ulong offset);
+static ulong load_serial_modem (uint mode, ulong offset);
 #endif
 
 #if (CONFIG_COMMANDS & CFG_CMD_LOADS)
@@ -476,13 +476,22 @@ int do_load_serial_bin (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 		}
 	}
 
-	if (strcmp(argv[0],"loady")==0) {
+	if (strcmp(argv[0],"loadx")==0) {
+		printf ("## Ready for binary (xmodem) download "
+			"to 0x%08lX at %d bps...\n",
+			offset,
+			load_baudrate);
+
+		addr = load_serial_modem (xyzModem_xmodem, offset);
+
+	}
+	else if (strcmp(argv[0],"loady")==0) {
 		printf ("## Ready for binary (ymodem) download "
 			"to 0x%08lX at %d bps...\n",
 			offset,
 			load_baudrate);
 
-		addr = load_serial_ymodem (offset);
+		addr = load_serial_modem (xyzModem_ymodem, offset);
 
 	} else {
 
@@ -980,7 +989,7 @@ static int getcxmodem(void) {
 		return (getc());
 	return -1;
 }
-static ulong load_serial_ymodem (ulong offset)
+static ulong load_serial_modem (uint mode, ulong offset)
 {
 	int size;
 	char buf[32];
@@ -992,7 +1001,7 @@ static ulong load_serial_ymodem (ulong offset)
 	ulong addr = 0;
 
 	size = 0;
-	info.mode = xyzModem_ymodem;
+	info.mode = mode;
 	res = xyzModem_stream_open (&info, &err);
 	if (!res) {
 
@@ -1098,6 +1107,14 @@ U_BOOT_CMD(
 U_BOOT_CMD(
 	loady, 3, 0,	do_load_serial_bin,
 	"loady   - load binary file over serial line (ymodem mode)\n",
+	"[ off ] [ baud ]\n"
+	"    - load binary file over serial line"
+	" with offset 'off' and baudrate 'baud'\n"
+);
+
+U_BOOT_CMD(
+	loadx, 3, 0,	do_load_serial_bin,
+	"loadx   - load binary file over serial line (xmodem mode)\n",
 	"[ off ] [ baud ]\n"
 	"    - load binary file over serial line"
 	" with offset 'off' and baudrate 'baud'\n"

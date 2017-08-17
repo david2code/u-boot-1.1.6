@@ -325,10 +325,12 @@ void start_armboot (void)
 		char tmp[64];
 
 		i = getenv_r ("ethaddr", tmp, sizeof (tmp));
+		//printf(tmp);
 		s = (i > 0) ? tmp : NULL;
 
 		for (reg = 0; reg < 6; ++reg) {
 			gd->bd->bi_enetaddr[reg] = s ? simple_strtoul (s, &e, 16) : 0;
+			//printf("%u\n", gd->bd->bi_enetaddr[reg]);
 			if (s)
 				s = (*e) ? e + 1 : e;
 		}

@@ -53,9 +53,21 @@
 /*
  * Hardware drivers
  */
+#if 0
 #define CONFIG_DRIVER_CS8900	1	/* we have a CS8900 on-board */
 #define CS8900_BASE		0x19000300
 #define CS8900_BUS16		1 /* the Linux driver does accesses as shorts */
+#endif
+//#define CONFIG_DM9000_DEBUG
+
+#define CONFIG_DRIVER_DM9000 1 /* we have a DM9000EP on-board */
+//#define CONFIG_NET_MULTI 1
+#define CONFIG_DM9000_NO_SROM        1
+#define CONFIG_DM9000_BASE           0x20000300
+#define DM9000_IO					 CONFIG_DM9000_BASE
+#define DM9000_DATA              (CONFIG_DM9000_BASE + 4)
+#define CONFIG_DM9000_USE_16BIT
+
 
 /*
  * select serial console configuration
@@ -78,11 +90,13 @@
 #define CONFIG_COMMANDS \
 			(CONFIG_CMD_DFL	 | \
 			CFG_CMD_CACHE	 | \
-			/*CFG_CMD_NAND	 |*/ \
+			CFG_CMD_NAND	 | \
+			CFG_CMD_JFFS2	 | \
 			/*CFG_CMD_EEPROM |*/ \
 			/*CFG_CMD_I2C	 |*/ \
 			/*CFG_CMD_USB	 |*/ \
 			CFG_CMD_REGINFO  | \
+			CFG_CMD_PING     | \
 			CFG_CMD_DATE	 | \
 			CFG_CMD_ELF)
 
@@ -91,9 +105,9 @@
 
 #define CONFIG_BOOTDELAY	3
 /*#define CONFIG_BOOTARGS    	"root=ramfs devfs=mount console=ttySA0,9600" */
-/*#define CONFIG_ETHADDR	08:00:3e:26:0a:5b */
+#define CONFIG_ETHADDR	      88:88:88:88:88:88 
 #define CONFIG_NETMASK          255.255.255.0
-#define CONFIG_IPADDR		10.0.0.110
+#define CONFIG_IPADDR		    10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
 /*#define CONFIG_BOOTFILE	"elinos-lart" */
 /*#define CONFIG_BOOTCOMMAND	"tftp; bootm" */
@@ -108,7 +122,7 @@
  * Miscellaneous configurable options
  */
 #define	CFG_LONGHELP				/* undef to save memory		*/
-#define	CFG_PROMPT		"SMDK2410 # "	/* Monitor Command Prompt	*/
+#define	CFG_PROMPT		"TQ2440 # "	/* Monitor Command Prompt	*/
 #define	CFG_CBSIZE		256		/* Console I/O Buffer Size	*/
 #define	CFG_PBSIZE (CFG_CBSIZE+sizeof(CFG_PROMPT)+16) /* Print Buffer Size */
 #define	CFG_MAXARGS		16		/* max number of command args	*/
@@ -154,16 +168,16 @@
  * FLASH and environment organization
  */
 
-#define CONFIG_AMD_LV400	1	/* uncomment this if you have a LV400 flash */
 #if 0
-#define CONFIG_AMD_LV800	1	/* uncomment this if you have a LV800 flash */
+#define CONFIG_AMD_LV400	1	/* uncomment this if you have a LV400 flash */
 #endif
+#define CONFIG_AMD_LV800	1	/* uncomment this if you have a LV800 flash */
 
 #define CFG_MAX_FLASH_BANKS	1	/* max number of memory banks */
 #ifdef CONFIG_AMD_LV800
-#define PHYS_FLASH_SIZE		0x00100000 /* 1MB */
-#define CFG_MAX_FLASH_SECT	(19)	/* max number of sectors on one chip */
-#define CFG_ENV_ADDR		(CFG_FLASH_BASE + 0x0F0000) /* addr of environment */
+#define PHYS_FLASH_SIZE		0x00200000 /* 2MB */
+#define CFG_MAX_FLASH_SECT	(35)	/* max number of sectors on one chip */
+#define CFG_ENV_ADDR		(CFG_FLASH_BASE + 0x1E0000) /* addr of environment */
 #endif
 #ifdef CONFIG_AMD_LV400
 #define PHYS_FLASH_SIZE		0x00080000 /* 512KB */
@@ -176,6 +190,35 @@
 #define CFG_FLASH_WRITE_TOUT	(5*CFG_HZ) /* Timeout for Flash Write */
 
 #define	CFG_ENV_IS_IN_FLASH	1
+#define CFG_ENV_OFFSET  0x40000
 #define CFG_ENV_SIZE		0x10000	/* Total Size of Environment Sector */
 
+/*--------------------------------------------
+ * NAND FLASH
+ */
+ #define CFG_NAND_BASE 0
+ #define CFG_MAX_NAND_DEVICE 1
+ #define NAND_MAX_CHIPS  1
+#if 1
+/* for tags tansfer messages to kernel */
+#define CONFIG_SETUP_MEMORY_TAGS 	1
+#define CONFIG_CMDLINE_TAG        	1
+#define CONFIG_INITRD_TAG			1
+#define CONFIG_BOOTARGS 			"noinitrd root=/dev/mtdblock2 init=/linuxrc console=ttySACO"
+#define CONFIG_BOOTCOMMAND   		"nboot 0x32000000 kernel; bootm 0x32000000"
+#endif
+#if 1
+ /*--------------------------------------------
+ * MTD parts
+ */
+#define  CONFIG_JFFS2_CMDLINE  1
+#define CONFIG_JFFS2_NAND 1
+
+#define MTDIDS_DEFAULT 	"nand0=nandflash0"
+#define MTDPARTS_DEFAULT	"mtdparts=nandflash0:256k@0(bios),"\
+							"128k(params),"\
+							"128k(toc),"\
+							"2m(kernel),"\
+							"-(root)"
+#endif
 #endif	/* __CONFIG_H */

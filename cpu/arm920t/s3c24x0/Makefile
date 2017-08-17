@@ -25,7 +25,7 @@ include $(TOPDIR)/config.mk
 
 LIB	= $(obj)lib$(SOC).a
 
-COBJS	= i2c.o interrupts.o serial.o speed.o \
+COBJS	= nand_flash.o i2c.o interrupts.o serial.o speed.o \
 	  usb_ohci.o
 
 SRCS	:= $(SOBJS:.o=.S) $(COBJS:.o=.c)
