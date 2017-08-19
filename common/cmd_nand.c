@@ -378,6 +378,35 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 				opts.skipfirstblk = 1;
 				ret = nand_write_opts(nand, &opts);
 			}
+        }else if (  s != NULL && !strcmp(s, ".raw")){
+            if (read) {
+                /* read */
+                nand_read_options_t opts;
+                memset(&opts, 0, sizeof(opts));
+                opts.buffer = (u_char*) addr;
+                opts.length = size;
+                opts.offset = off;
+                opts.readoob = 0;
+                opts.quiet      = quiet;
+                opts.noecc  = 1;
+                opts.nocheckbadblk = 1;
+                ret = nand_read_opts(nand, &opts);
+            } else {
+                /* write */
+                nand_write_options_t opts;
+                memset(&opts, 0, sizeof(opts));
+                opts.buffer = (u_char*) addr;
+                opts.length = size;
+                opts.offset = off;
+                /* opts.forceyaffs = 1; */
+                opts.noecc = 1;
+                opts.writeoob = 0;
+                opts.blockalign = 1;
+                opts.quiet      = quiet;
+                opts.skipfirstblk = 0;
+                opts.nocheckbadblk = 1;
+                ret = nand_write_opts(nand, &opts);
+            }
 		}else {
 			if (read)
 				ret = nand_read(nand, off, &size, (u_char *)addr);
@@ -493,6 +522,10 @@ U_BOOT_CMD(nand, 5, 1, do_nand,
 	"    at offset `off' to memory address `addr'\n"
 	"nand write.yaffs addr off size - write `size' bytes yaffs image starting\n"
 	"    at offset `off' from memory address `addr'\n"
+    "nand read.raw addr off size - read the `size' bytes starting\n"
+    "    at offset `off' to memory address `addr', without oob and ecc\n"
+    "nand write.raw addr off size - write the `size' bytes starting\n"
+    "    at offset `off' from memory address `addr', without oob and ecc\n"
 	"nand erase [clean] [off size] - erase `size' bytes from\n"
 	"    offset `off' (entire device if not specified)\n"
 	"nand bad - show bad blocks\n"

@@ -31,7 +31,7 @@
 #if defined(CONFIG_I386)
 DECLARE_GLOBAL_DATA_PTR;
 #endif
-
+#if 0
 
 void  call_linux(long a0, long a1, long a2)
 {
@@ -88,13 +88,15 @@ static void setup_linux_param(ulong param_base)
 	}
 }
 
-
+#endif
 
 int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	ulong	addr, rc;
 	int     rcode = 0;
 	ulong   to;
+	
+#if 0
 
 	to = 0x30000000 + LINUX_KERNEL_OFFSET;
 	
@@ -105,7 +107,6 @@ int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 //		printf("zImage magic = 0x%08lx\n", *(ulong *)(to + 9*4));
 		;
 	}
-
 	/* Go Go Go */
 	printf("NOW, Booting Linux......\n");	
 	
@@ -113,7 +114,7 @@ int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	setup_linux_param(0x30000000 + LINUX_PARAM_OFFSET);
 	call_linux(0, MACH_TYPE_S3C2440, to);
 	
-
+#endif
 	if (argc < 2) {
 		printf ("Usage:\n%s\n", cmdtp->usage);
 		return 1;
@@ -146,13 +147,6 @@ int do_go (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 	printf ("## Application terminated, rc = 0x%lX\n", rc);
 
-	
-	/* Setup linux parameters and linux command line */
-	setup_linux_param(0x30000000 + LINUX_PARAM_OFFSET);
-
-	/* Go Go Go */
-	printf("NOW, Booting Linux......\n");	
-	call_linux(0, MACH_TYPE_S3C2440, 0x30008000);
 	return rcode;
 }
 

@@ -108,7 +108,7 @@
 #endif /* (CONFIG_COMMANDS & CFG_CMD_NAND) */
 /* enable/disable debugging messages */
 #define	DEBUG_JFFS
-#undef	DEBUG_JFFS
+//#undef	DEBUG_JFFS
 
 #ifdef  DEBUG_JFFS
 # define DEBUGF(fmt, args...)	printf(fmt ,##args)

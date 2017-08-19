@@ -443,6 +443,18 @@ void main_loop (void)
 	}
 #endif
 
+#ifdef CONFIG_JFFS2_CMDLINE
+	extern int mtdparts_init(void);
+	if (!getenv("mtdparts"))
+	{
+		run_command("mtdparts default", 0);
+	}
+	else
+	{
+		mtdparts_init();
+	}
+#endif
+
 	/*
 	 * Main Loop for Monitor Command Processing
 	 */

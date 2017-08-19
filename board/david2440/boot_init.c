@@ -2,34 +2,6 @@
 #include <s3c2410.h>
 
 
-static inline void delay (unsigned long loops)
-{
-	__asm__ volatile ("1:\n"
-	  "subs %0, %1, #1\n"
-	  "bne 1b":"=r" (loops):"0" (loops));
-}
-
-
-void clock_init (void)
-{
-	S3C24X0_CLOCK_POWER * const clk_power = S3C24X0_GetBase_CLOCK_POWER();
-
-	clk_power->CLKDIVN = S3C2440_CLKDIV;
-
-	__asm__( "mrc p15, 0, r1, c1, c0, 0\n" /* read ctrl register */
-			"orr r1, r1, #0xc0000000\n" /* Asynchronous */
-			"mcr p15, 0, r1, c1, c0, 0\n" /* write ctrl register */
-			:::"r1"
-			);
-
-	clk_power->LOCKTIME = 0xFFFFFF;
-	clk_power->MPLLCON = S3C2440_MPLL_400MHZ;
-
-	delay(4000);
-	clk_power->UPLLCON = S3C2440_UPLL_48MHZ;
-	delay(8000);
-		
-}
 
 #define BUSY            1
 
@@ -44,7 +16,8 @@ char b128MB;				//HJ_add 20090807
 
 
 /* 供外部调用的函数 */
-void nand_init_ll(void);int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size);
+void nand_init_ll(void);
+int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size);
 int nand_read_ll_lp(unsigned char *buf, unsigned long start_addr, int size);
 
 /* NAND Flash操作的总入口, 它们将调用S3C2410或S3C2440的相应函数 */
@@ -242,7 +215,8 @@ int NF_ReadID(void)
 	b128MB = 1;
 	n4thcycle = nBuff = 0;
 
-	nand_init_ll();	nand_select_chip();
+	nand_init_ll();
+	nand_select_chip();
 	write_cmd(0x90);	// read id command
 	*p=0x00 & 0xff;
 	for ( i = 0; i < 100; i++ );
@@ -252,7 +226,7 @@ int NF_ReadID(void)
 	nBuff =  read_data();
 	n4thcycle = read_data();
 	nand_deselect_chip();
-		if (pDID >= 0xA0)
+	if (pDID >= 0xA0)
 	{
 		b128MB = 0;
 	}
@@ -263,18 +237,26 @@ int NF_ReadID(void)
 /* 读函数 */
 int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 {
-	int i, j;	char dat;	S3C2440_NAND * s3c2440nand = (S3C2440_NAND *)0x4e000000;
+	int i, j;
+	char dat;
+	S3C2440_NAND * s3c2440nand = (S3C2440_NAND *)0x4e000000;
 	volatile unsigned char *p = (volatile unsigned char *)&s3c2440nand->NFADDR;
 
     
-	if ((start_addr & NAND_BLOCK_MASK) || (size & NAND_BLOCK_MASK))	{
+	if ((start_addr & NAND_BLOCK_MASK) || (size & NAND_BLOCK_MASK))
+	{
 		return -1;    /* 地址或长度不对齐 */
 	}
 	/* 选中芯片 */
 	nand_select_chip();
 
-	for(i=start_addr; i < (start_addr + size);)	{
-/* Check Bad Block */if(1){		/* 发出READ0命令 */		write_cmd(0x50);		*p = 5;
+	for(i=start_addr; i < (start_addr + size);)
+	{
+		/* Check Bad Block */
+		if(1){		
+		/* 发出READ0命令 */		
+		write_cmd(0x50);
+		*p = 5;
 		for(j=0; j<10; j++);
 		*p = (i >> 9) & 0xff;
 		for(j=0; j<10; j++);
@@ -284,10 +266,14 @@ int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 		for(j=0; j<10; j++);
 		wait_idle();
 
-		dat = read_data();		write_cmd(0);		
+		dat = read_data();
+		write_cmd(0);		
 		/* 取消片选信号 */
 		nand_deselect_chip();
-		if(dat != 0xff)			i += 16384;		// 1 Block = 512*32= 16384/* Read Page */		/* 选中芯片 */
+		if(dat != 0xff)
+			i += 16384;		// 1 Block = 512*32= 16384
+			/* Read Page */		
+			/* 选中芯片 */
 		nand_select_chip();
 }		/* 发出READ0命令 */
 		write_cmd(0);
@@ -296,7 +282,8 @@ int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 		write_addr(i);
 		wait_idle();
 
-		for(j=0; j < NAND_SECTOR_SIZE; j++, i++)		{
+		for(j=0; j < NAND_SECTOR_SIZE; j++, i++)
+		{
 			*buf = read_data();
 			buf++;
 		}
@@ -314,10 +301,12 @@ int nand_read_ll(unsigned char *buf, unsigned long start_addr, int size)
 int nand_read_ll_lp(unsigned char *buf, unsigned long start_addr, int size)
 {
 	int i, j;
-	char dat;	S3C2440_NAND * s3c2440nand = (S3C2440_NAND *)0x4e000000;
+	char dat;
+	S3C2440_NAND * s3c2440nand = (S3C2440_NAND *)0x4e000000;
 	volatile unsigned char *p = (volatile unsigned char *)&s3c2440nand->NFADDR;
 
-	if ((start_addr & NAND_BLOCK_MASK_LP) || (size & NAND_BLOCK_MASK_LP))	{
+	if ((start_addr & NAND_BLOCK_MASK_LP) || (size & NAND_BLOCK_MASK_LP))
+	{
 		return -1;    /* 地址或长度不对齐 */
 	}
 
@@ -353,7 +342,9 @@ int nand_read_ll_lp(unsigned char *buf, unsigned long start_addr, int size)
 			/* 取消片选信号 */
 			nand_deselect_chip();
 			if(dat != 0xff)
-				i += 131072;		// 1 Block = 2048*64= 131072/* Read Page */		/* 选中芯片 */
+				i += 131072;		// 1 Block = 2048*64= 131072
+			/* Read Page */
+			/* 选中芯片 */
 			nand_select_chip();
 		}		/* 发出READ0命令 */
 		write_cmd(0);
@@ -363,7 +354,7 @@ int nand_read_ll_lp(unsigned char *buf, unsigned long start_addr, int size)
 		write_cmd(0x30);
 		wait_idle();
 
-		for(j=0; j < NAND_SECTOR_SIZE_LP; j++, i++)	
+		for(j=0; j < NAND_SECTOR_SIZE_LP; j++, i++)
 		{
 			*buf = read_data();
 			buf++;
@@ -379,7 +370,16 @@ int nand_read_ll_lp(unsigned char *buf, unsigned long start_addr, int size)
 int bBootFrmNORFlash(void)
 {	
 	volatile unsigned int *pdw = (volatile unsigned int *)0;	
-	unsigned int dwVal;	/*	 * 无论是从NOR Flash还是从NAND Flash启动，	 * 地址0处为指令"b	Reset", 机器码为0xEA00000B，	 * 对于从NAND Flash启动的情况，其开始4KB的代码会复制到CPU内部4K内存中，	 * 对于从NOR Flash启动的情况，NOR Flash的开始地址即为0。	 * 对于NOR Flash，必须通过一定的命令序列才能写数据，	 * 所以可以根据这点差别来分辨是从NAND Flash还是NOR Flash启动:	 * 向地址0写入一个数据，然后读出来，如果没有改变的话就是NOR Flash	 */	
+	unsigned int dwVal;
+	/*
+	 * 无论是从NOR Flash还是从NAND Flash启动，	
+	 * 地址0处为指令"b	Reset", 机器码为0xEA00000B，	 
+	 * 对于从NAND Flash启动的情况，其开始4KB的代码会复制到CPU内部4K内存中，	 
+	 * 对于从NOR Flash启动的情况，NOR Flash的开始地址即为0。	 
+	 * 对于NOR Flash，必须通过一定的命令序列才能写数据，	 
+	 * 所以可以根据这点差别来分辨是从NAND Flash还是NOR Flash启动:	 
+	 * 向地址0写入一个数据，然后读出来，如果没有改变的话就是NOR Flash	 
+	 */	
 	dwVal = *pdw;       	
 	*pdw = 0x12345678;	
 
@@ -420,4 +420,33 @@ int copycode2ram(unsigned long start_addr, unsigned char *buf, int size)
 			nand_read_ll_lp(buf, start_addr, (size + NAND_BLOCK_MASK_LP)&~(NAND_BLOCK_MASK_LP));
 		return 0;
 	}
+}
+
+static inline void delay (unsigned long loops)
+{
+	__asm__ volatile ("1:\n"
+	  		"subs %0, %1, #1\n"
+	  		"bne 1b":"=r" (loops):"0" (loops));
+}
+
+
+void clock_init (void)
+{
+	S3C24X0_CLOCK_POWER * const clk_power = S3C24X0_GetBase_CLOCK_POWER();
+
+	clk_power->CLKDIVN = S3C2440_CLKDIV;
+
+	__asm__( "mrc p15, 0, r1, c1, c0, 0\n" /* read ctrl register */
+			"orr r1, r1, #0xc0000000\n" /* Asynchronous */
+			"mcr p15, 0, r1, c1, c0, 0\n" /* write ctrl register */
+			:::"r1"
+			);
+
+	clk_power->LOCKTIME = 0xFFFFFF;
+	clk_power->MPLLCON = S3C2440_MPLL_400MHZ;
+
+	delay(4000);
+	clk_power->UPLLCON = S3C2440_UPLL_48MHZ;
+	delay(8000);
+		
 }

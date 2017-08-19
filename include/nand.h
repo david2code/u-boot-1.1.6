@@ -81,6 +81,9 @@ struct nand_write_options {
     int skipfirstblk;	/* if true, skip the first good block,
     					*set true when write the yaffs image
 				 		*/
+    int nocheckbadblk;  /* if true, don't check bad blockes,
+                         * use them as good blockes
+                         */                    
 };
 
 typedef struct nand_write_options nand_write_options_t;
@@ -91,6 +94,10 @@ struct nand_read_options {
 	ulong offset;		/* start address in NAND */
 	int quiet;		/* don't display progress messages */
 	int readoob;		/* put oob data in image */
+	int noecc;		/* read without ecc */
+    int nocheckbadblk;  /* if true, don't check bad blockes,
+                         * use them as good blockes
+                         */                    
 };
 
 typedef struct nand_read_options nand_read_options_t;

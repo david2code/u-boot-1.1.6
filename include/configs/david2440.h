@@ -103,15 +103,11 @@
 /* this must be included AFTER the definition of CONFIG_COMMANDS (if any) */
 #include <cmd_confdefs.h>
 
-#define CONFIG_BOOTDELAY	3
-/*#define CONFIG_BOOTARGS    	"root=ramfs devfs=mount console=ttySA0,9600" */
 #define CONFIG_ETHADDR	      16:88:88:88:88:78 
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		    10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
 #define CONFIG_GATEWAYIP		10.0.0.1
-/*#define CONFIG_BOOTFILE	"elinos-lart" */
-/*#define CONFIG_BOOTCOMMAND	"tftp; bootm" */
 
 #if (CONFIG_COMMANDS & CFG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	115200		/* speed to run kgdb serial port */
@@ -205,8 +201,9 @@
 #define CONFIG_SETUP_MEMORY_TAGS 	1
 #define CONFIG_CMDLINE_TAG        	1
 #define CONFIG_INITRD_TAG			1
+#define CONFIG_BOOTDELAY			0
 #define CONFIG_BOOTARGS 			"noinitrd root=/dev/mtdblock2 init=/linuxrc console=ttySACO"
-#define CONFIG_BOOTCOMMAND   		"nboot 0x32000000 kernel; bootm 0x32000000"
+#define CONFIG_BOOTCOMMAND   		"boot_zImage"
 #endif
 #if 1
  /*--------------------------------------------
@@ -216,10 +213,12 @@
 #define CONFIG_JFFS2_NAND 1
 
 #define MTDIDS_DEFAULT 	"nand0=nandflash0"
-#define MTDPARTS_DEFAULT	"mtdparts=nandflash0:256k@0(bios),"\
-							"128k(params),"\
-							"128k(toc),"\
-							"2m(kernel),"\
-							"-(root)"
+#define MTDPARTS_DEFAULT		"mtdparts=nandflash0:256k@0(bios)," \
+                           		 "128k(params)," \
+                           		 "128k(toc)," \
+                           		 "512k(eboot)," \
+                           		 "1024k(logo)," \
+                           		 "3m(kernel)," \
+                           		 "-(root)"
 #endif
 #endif	/* __CONFIG_H */
