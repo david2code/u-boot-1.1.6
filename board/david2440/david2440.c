@@ -54,9 +54,6 @@ DECLARE_GLOBAL_DATA_PTR;
 #define U_M_SDIV	0x2
 #endif
 
-#define S3C2440_MPLL_400MHZ ((0x7f<<12)|(0x02<<4)|(0x01))
-#define S3C2440_UPLL_48MHZ ((0x38<<12)|(0x02<<4)|(0x02))
-#define S3C2440_CLKDIV		0x05
 static inline void delay (unsigned long loops)
 {
 	__asm__ volatile ("1:\n"
@@ -89,7 +86,7 @@ int board_init (void)
 	gpio->GPGUP = 0x0000FFFF;
 	gpio->GPHCON = 0x002AFAAA;
 	gpio->GPHUP = 0x000007FF;
-
+#if 0
 	clk_power->CLKDIVN = S3C2440_CLKDIV;
 
 	__asm__( "mrc p15, 0, r1, c1, c0, 0\n" /* read ctrl register */
@@ -104,6 +101,8 @@ int board_init (void)
 	delay(4000);
 	clk_power->UPLLCON = S3C2440_UPLL_48MHZ;
 	delay(8000);
+#endif
+
 	/* arch number of SMDK2410-Board */
 	gd->bd->bi_arch_number = MACH_TYPE_S3C2440;
 

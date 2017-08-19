@@ -229,4 +229,13 @@ static inline S3C2410_SDI * const S3C2410_GetBase_SDI(void)
 		 rINTPND;\
 		 }
 /* Wait until rINTPND is changed for the case that the ISR is very short. */
+
+
+#define GSTATUS1  	(*(volatile unsgined int *)0x560000B0)
+
+/* s3c2440 clock define */
+#define S3C2440_MPLL_400MHZ ((0x7f<<12)|(0x02<<4)|(0x01))
+#define S3C2440_UPLL_48MHZ ((0x38<<12)|(0x02<<4)|(0x02))
+#define S3C2440_CLKDIV		0x05
+
 #endif /*__S3C2410_H__*/
