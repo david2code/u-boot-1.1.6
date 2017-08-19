@@ -105,10 +105,11 @@
 
 #define CONFIG_BOOTDELAY	3
 /*#define CONFIG_BOOTARGS    	"root=ramfs devfs=mount console=ttySA0,9600" */
-#define CONFIG_ETHADDR	      88:88:88:88:88:88 
+#define CONFIG_ETHADDR	      16:88:88:88:88:78 
 #define CONFIG_NETMASK          255.255.255.0
 #define CONFIG_IPADDR		    10.0.0.110
 #define CONFIG_SERVERIP		10.0.0.1
+#define CONFIG_GATEWAYIP		10.0.0.1
 /*#define CONFIG_BOOTFILE	"elinos-lart" */
 /*#define CONFIG_BOOTCOMMAND	"tftp; bootm" */
 

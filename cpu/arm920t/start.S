@@ -182,6 +182,9 @@ relocate:				/* relocate U-Boot to RAM	    */
 	ldr	r2, _armboot_start
 	ldr	r3, _bss_start
 	sub	r2, r3, r2		/* r2 <- size of armboot            */
+#if 1
+	bl	copycode2ram
+#else
 	add	r2, r0, r2		/* r2 <- source end address         */
 
 copy_loop:
@@ -189,6 +192,7 @@ copy_loop:
 	stmia	r1!, {r3-r10}		/* copy to   target address [r1]    */
 	cmp	r0, r2			/* until source end addreee [r2]    */
 	ble	copy_loop
+#endif	
 #endif	/* CONFIG_SKIP_RELOCATE_UBOOT */
 
 
